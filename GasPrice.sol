@@ -99,7 +99,7 @@ abstract contract Ownable is Context {
 // File contracts/bsc/byalan/GasPrice.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 contract GasPrice is Ownable {
     uint256 public maxGasPrice = 10 gwei;

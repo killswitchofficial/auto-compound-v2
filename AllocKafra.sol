@@ -99,7 +99,7 @@ abstract contract Ownable is Context {
 // File contracts/bsc/interfaces/IAllocKafra.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface IAllocKafra {
     function MAX_ALLOCATION() external view returns (uint16);
@@ -118,7 +118,7 @@ interface IAllocKafra {
 // File contracts/bsc/AllocKafra.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 contract AllocKafra is Ownable, IAllocKafra {
     uint16 public constant override MAX_ALLOCATION = 10000;

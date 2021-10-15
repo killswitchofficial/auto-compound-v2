@@ -566,7 +566,7 @@ abstract contract ReentrancyGuard {
 // File contracts/libraries/Math.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 library Math {
     /**
@@ -611,7 +611,7 @@ library Math {
 // File contracts/bsc/interfaces/IPronteraReserve.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface IPronteraReserve {
     function balances() external view returns (uint256);
@@ -623,7 +623,7 @@ interface IPronteraReserve {
 // File contracts/bsc/Emperium.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 
 
@@ -652,6 +652,8 @@ contract Emperium is Ownable {
     address public immutable ksw;
     // KSW tokens rewards per second.
     uint256 public kswPerSecond;
+    // deposited KSW
+    uint256 public totalKSWDeposited;
 
     // Info of each pool.
     PoolInfo[] public poolInfo;
@@ -694,7 +696,7 @@ contract Emperium is Ownable {
     }
 
     // Update the given pool's KSW allocation point.
-    function set(uint256 pid, uint64 allocPoint) public onlyOwner {
+    function set(uint256 pid, uint64 allocPoint) external onlyOwner {
         massUpdatePools();
 
         totalAllocPoint = (totalAllocPoint - poolInfo[pid].allocPoint) + allocPoint;
@@ -706,7 +708,7 @@ contract Emperium is Ownable {
         PoolInfo storage pool = poolInfo[pid];
         UserInfo storage user = userInfo[pid][_user];
         uint256 accKSWPerShare = pool.accKSWPerShare;
-        uint256 tokenSupply = pool.token.balanceOf(address(this));
+        uint256 tokenSupply = address(pool.token) == ksw ? totalKSWDeposited : pool.token.balanceOf(address(this));
         if (block.timestamp > pool.lastRewardTime && tokenSupply != 0) {
             uint256 time = block.timestamp - pool.lastRewardTime;
             uint256 kswReward = (time * kswPerSecond * pool.allocPoint) / totalAllocPoint;
@@ -731,7 +733,7 @@ contract Emperium is Ownable {
     function updatePool(uint256 pid) public {
         PoolInfo storage pool = poolInfo[pid];
         if (block.timestamp > pool.lastRewardTime) {
-            uint256 tokenSupply = pool.token.balanceOf(address(this));
+            uint256 tokenSupply = address(pool.token) == ksw ? totalKSWDeposited : pool.token.balanceOf(address(this));
             if (tokenSupply > 0) {
                 uint256 time = block.timestamp - pool.lastRewardTime;
                 uint256 kswReward = (time * kswPerSecond * pool.allocPoint) / totalAllocPoint;
@@ -757,6 +759,9 @@ contract Emperium is Ownable {
         user.rewardDebt = (user.amount * pool.accKSWPerShare) / 1e12;
         if (amount > 0) {
             require(_safeERC20TransferIn(pool.token, amount) == amount, "!amount");
+            if (address(pool.token) == ksw) {
+                totalKSWDeposited += amount;
+            }
         }
         emit Deposit(msg.sender, pid, amount);
     }
@@ -775,6 +780,9 @@ contract Emperium is Ownable {
         user.amount -= amount;
         user.rewardDebt = (user.amount * pool.accKSWPerShare) / 1e12;
         if (amount > 0) {
+            if (address(pool.token) == ksw) {
+                totalKSWDeposited -= amount;
+            }
             pool.token.safeTransfer(msg.sender, amount);
         }
         emit Withdraw(msg.sender, pid, amount);
@@ -787,6 +795,9 @@ contract Emperium is Ownable {
         uint256 amount = user.amount;
         user.amount = 0;
         user.rewardDebt = 0;
+        if (address(pool.token) == ksw) {
+            totalKSWDeposited -= amount;
+        }
         pool.token.safeTransfer(msg.sender, amount);
         emit EmergencyWithdraw(msg.sender, pid, amount);
     }

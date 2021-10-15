@@ -501,7 +501,7 @@ library SafeERC20 {
 // File contracts/bsc/interfaces/IByalanIsland.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface IByalanIsland {
     function izlude() external view returns (address);
@@ -511,7 +511,7 @@ interface IByalanIsland {
 // File contracts/bsc/interfaces/ISailor.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface ISailor {
     function MAX_FEE() external view returns (uint256);
@@ -527,7 +527,7 @@ interface ISailor {
 // File contracts/bsc/interfaces/IByalan.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 interface IByalan is IByalanIsland, ISailor {
     function want() external view returns (address);
 
@@ -564,28 +564,18 @@ interface IByalan is IByalanIsland, ISailor {
 // File contracts/bsc/interfaces/IFeeKafra.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface IFeeKafra {
     function MAX_FEE() external view returns (uint256);
 
-    function depositFee() external view returns (uint256);
-
     function withdrawFee() external view returns (uint256);
-
-    function treasuryFeeDeposit() external view returns (uint256);
-
-    function kswFeeDeposit() external view returns (uint256);
 
     function treasuryFeeWithdraw() external view returns (uint256);
 
     function kswFeeWithdraw() external view returns (uint256);
 
-    function calculateDepositFee(uint256 _wantAmount, address _user) external view returns (uint256);
-
     function calculateWithdrawFee(uint256 _wantAmount, address _user) external view returns (uint256);
-
-    function distributeDepositFee(IERC20 _token, address _fromUser) external;
 
     function distributeWithdrawFee(IERC20 _token, address _fromUser) external;
 }
@@ -594,7 +584,7 @@ interface IFeeKafra {
 // File contracts/bsc/interfaces/IAllocKafra.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface IAllocKafra {
     function MAX_ALLOCATION() external view returns (uint16);
@@ -613,7 +603,7 @@ interface IAllocKafra {
 // File contracts/bsc/interfaces/IIzludeV2.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 
 
@@ -644,7 +634,7 @@ interface IIzludeV2 {
 // File contracts/libraries/Math.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 library Math {
     /**
@@ -689,7 +679,7 @@ library Math {
 // File contracts/bsc/IzludeV2.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 
 
@@ -702,7 +692,7 @@ contract IzludeV2 is IIzludeV2, Ownable {
 
     address public immutable override prontera;
     IByalan public override byalan;
-    IERC20 public override want;
+    IERC20 public immutable override want;
     uint256 public override totalSupply;
 
     IFeeKafra public override feeKafra;

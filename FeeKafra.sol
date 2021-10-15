@@ -501,7 +501,7 @@ library SafeERC20 {
 // File contracts/bsc/interfaces/IFeeKafra.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 interface IFeeKafra {
     function MAX_FEE() external view returns (uint256);
@@ -521,7 +521,7 @@ interface IFeeKafra {
 // File contracts/bsc/FeeKafra.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 
 contract FeeKafra is Ownable, IFeeKafra {

@@ -501,7 +501,7 @@ library SafeERC20 {
 // File contracts/libraries/Math.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 library Math {
     /**
@@ -546,7 +546,7 @@ library Math {
 // File contracts/bsc/PronteraReserve.sol
 
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.9;
 
 
 interface IReserveWithdrawer {
