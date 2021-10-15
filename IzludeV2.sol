@@ -501,7 +501,7 @@ library SafeERC20 {
 // File contracts/bsc/interfaces/IByalanIsland.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IByalanIsland {
     function izlude() external view returns (address);
@@ -511,7 +511,7 @@ interface IByalanIsland {
 // File contracts/bsc/interfaces/ISailor.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface ISailor {
     function MAX_FEE() external view returns (uint256);
@@ -527,7 +527,7 @@ interface ISailor {
 // File contracts/bsc/interfaces/IByalan.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 interface IByalan is IByalanIsland, ISailor {
     function want() external view returns (address);
 
@@ -564,7 +564,7 @@ interface IByalan is IByalanIsland, ISailor {
 // File contracts/bsc/interfaces/IFeeKafra.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IFeeKafra {
     function MAX_FEE() external view returns (uint256);
@@ -584,7 +584,7 @@ interface IFeeKafra {
 // File contracts/bsc/interfaces/IAllocKafra.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IAllocKafra {
     function MAX_ALLOCATION() external view returns (uint16);
@@ -603,7 +603,7 @@ interface IAllocKafra {
 // File contracts/bsc/interfaces/IIzludeV2.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 
@@ -634,7 +634,7 @@ interface IIzludeV2 {
 // File contracts/libraries/Math.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 library Math {
     /**
@@ -679,7 +679,7 @@ library Math {
 // File contracts/bsc/IzludeV2.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 

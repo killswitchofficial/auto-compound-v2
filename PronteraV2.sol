@@ -566,7 +566,7 @@ abstract contract ReentrancyGuard {
 // File contracts/libraries/Math.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 library Math {
     /**
@@ -611,7 +611,7 @@ library Math {
 // File contracts/bsc/interfaces/IPronteraReserve.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IPronteraReserve {
     function balances() external view returns (uint256);
@@ -623,7 +623,7 @@ interface IPronteraReserve {
 // File contracts/bsc/interfaces/IByalanIsland.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IByalanIsland {
     function izlude() external view returns (address);
@@ -633,7 +633,7 @@ interface IByalanIsland {
 // File contracts/bsc/interfaces/ISailor.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface ISailor {
     function MAX_FEE() external view returns (uint256);
@@ -649,7 +649,7 @@ interface ISailor {
 // File contracts/bsc/interfaces/IByalan.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 interface IByalan is IByalanIsland, ISailor {
     function want() external view returns (address);
 
@@ -686,7 +686,7 @@ interface IByalan is IByalanIsland, ISailor {
 // File contracts/bsc/interfaces/IFeeKafra.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IFeeKafra {
     function MAX_FEE() external view returns (uint256);
@@ -706,7 +706,7 @@ interface IFeeKafra {
 // File contracts/bsc/interfaces/IAllocKafra.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IAllocKafra {
     function MAX_ALLOCATION() external view returns (uint16);
@@ -725,7 +725,7 @@ interface IAllocKafra {
 // File contracts/bsc/interfaces/IIzludeV2.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 
@@ -756,7 +756,7 @@ interface IIzludeV2 {
 // File contracts/bsc/interfaces/IWETH.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IWETH is IERC20 {
     function deposit() external payable;
@@ -768,7 +768,7 @@ interface IWETH is IERC20 {
 // File contracts/bsc/PronteraV2.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 

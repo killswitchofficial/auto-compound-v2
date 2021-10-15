@@ -468,7 +468,7 @@ abstract contract ReentrancyGuard {
 // File contracts/bsc/interfaces/IUniswapV2Router02.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IUniswapV2Router01 {
     function factory() external pure returns (address);
@@ -674,7 +674,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 // File contracts/bsc/interfaces/IUniswapV2Pair.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IUniswapV2Pair {
     event Approval(address indexed owner, address indexed spender, uint256 value);
@@ -775,7 +775,7 @@ interface IUniswapV2Pair {
 // File contracts/bsc/interfaces/pancake/IMasterChef.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IMasterChef {
     struct UserInfo {
@@ -811,7 +811,7 @@ interface IMasterChef {
 // File contracts/bsc/interfaces/IByalanIsland.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IByalanIsland {
     function izlude() external view returns (address);
@@ -821,7 +821,7 @@ interface IByalanIsland {
 // File contracts/bsc/interfaces/ISailor.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface ISailor {
     function MAX_FEE() external view returns (uint256);
@@ -837,7 +837,7 @@ interface ISailor {
 // File contracts/bsc/interfaces/IByalan.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 interface IByalan is IByalanIsland, ISailor {
     function want() external view returns (address);
 
@@ -1063,7 +1063,7 @@ abstract contract Pausable is Context {
 // File contracts/bsc/interfaces/IGasPrice.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IGasPrice {
     function maxGasPrice() external returns (uint256);
@@ -1073,7 +1073,7 @@ interface IGasPrice {
 // File contracts/bsc/byalan/ByalanIsland.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 
@@ -1182,7 +1182,7 @@ abstract contract ByalanIsland is Ownable, Pausable, IByalanIsland {
 // File contracts/bsc/byalan/Sailor.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 abstract contract Sailor is ByalanIsland, ISailor {
     uint256 public constant override MAX_FEE = 10000;
@@ -1229,7 +1229,7 @@ abstract contract Sailor is ByalanIsland, ISailor {
 // File contracts/bsc/byalan/pancake/PancakeByalanLP.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 

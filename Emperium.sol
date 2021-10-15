@@ -566,7 +566,7 @@ abstract contract ReentrancyGuard {
 // File contracts/libraries/Math.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 library Math {
     /**
@@ -611,7 +611,7 @@ library Math {
 // File contracts/bsc/interfaces/IPronteraReserve.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 interface IPronteraReserve {
     function balances() external view returns (uint256);
@@ -623,7 +623,7 @@ interface IPronteraReserve {
 // File contracts/bsc/Emperium.sol
 
 
-pragma solidity ^0.8.9;
+pragma solidity 0.8.9;
 
 
 
