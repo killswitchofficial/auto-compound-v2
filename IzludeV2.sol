@@ -581,31 +581,10 @@ interface IFeeKafra {
 }
 
 
-// File contracts/bsc/interfaces/IAllocKafra.sol
-
-
-pragma solidity 0.8.9;
-
-interface IAllocKafra {
-    function MAX_ALLOCATION() external view returns (uint16);
-
-    function limitAllocation() external view returns (uint16);
-
-    function canAllocate(
-        uint256 _amount,
-        uint256 _balanceOfWant,
-        uint256 _balanceOfMasterChef,
-        address _user
-    ) external view returns (bool);
-}
-
-
 // File contracts/bsc/interfaces/IIzludeV2.sol
 
 
 pragma solidity 0.8.9;
-
-
 
 
 interface IIzludeV2 {
@@ -623,11 +602,30 @@ interface IIzludeV2 {
 
     function byalan() external view returns (IByalan);
 
-    function feeKafra() external view returns (IFeeKafra);
+    function feeKafra() external view returns (address);
 
-    function allocKafra() external view returns (IAllocKafra);
+    function allocKafra() external view returns (address);
 
     function calculateWithdrawFee(uint256 amount, address user) external view returns (uint256);
+}
+
+
+// File contracts/bsc/interfaces/IAllocKafra.sol
+
+
+pragma solidity 0.8.9;
+
+interface IAllocKafra {
+    function MAX_ALLOCATION() external view returns (uint16);
+
+    function limitAllocation() external view returns (uint16);
+
+    function canAllocate(
+        uint256 _amount,
+        uint256 _balanceOfWant,
+        uint256 _balanceOfMasterChef,
+        address _user
+    ) external view returns (bool);
 }
 
 
@@ -695,13 +693,13 @@ contract IzludeV2 is IIzludeV2, Ownable {
     IERC20 public immutable override want;
     uint256 public override totalSupply;
 
-    IFeeKafra public override feeKafra;
-    IAllocKafra public override allocKafra;
+    address public override feeKafra;
+    address public override allocKafra;
     address public tva;
 
     event UpgradeStrategy(address implementation);
-    event SetFeeKafra(IFeeKafra kafra);
-    event SetAllocKafra(IAllocKafra kafra);
+    event SetFeeKafra(address kafra);
+    event SetAllocKafra(address kafra);
     event SetTVA(address tva);
 
     constructor(
@@ -720,12 +718,12 @@ contract IzludeV2 is IIzludeV2, Ownable {
         _;
     }
 
-    function setFeeKafra(IFeeKafra _feeKafra) external onlyOwner {
+    function setFeeKafra(address _feeKafra) external onlyOwner {
         feeKafra = _feeKafra;
         emit SetFeeKafra(_feeKafra);
     }
 
-    function setAllocKafra(IAllocKafra _allocKafra) external onlyOwner {
+    function setAllocKafra(address _allocKafra) external onlyOwner {
         allocKafra = _allocKafra;
         emit SetAllocKafra(_allocKafra);
     }
@@ -746,10 +744,10 @@ contract IzludeV2 is IIzludeV2, Ownable {
     }
 
     function calculateWithdrawFee(uint256 amount, address user) public view override returns (uint256) {
-        if (address(feeKafra) == address(0)) {
+        if (feeKafra == address(0)) {
             return 0;
         }
-        return Math.min(feeKafra.calculateWithdrawFee(amount, user), _calculateMaxWithdrawFee(amount));
+        return Math.min(IFeeKafra(feeKafra).calculateWithdrawFee(amount, user), _calculateMaxWithdrawFee(amount));
     }
 
     function _calculateMaxWithdrawFee(uint256 amount) private pure returns (uint256) {
@@ -758,8 +756,8 @@ contract IzludeV2 is IIzludeV2, Ownable {
 
     function checkAllocation(uint256 amount, address user) private view {
         require(
-            address(allocKafra) == address(0) ||
-                allocKafra.canAllocate(amount, byalan.balanceOf(), byalan.balanceOfMasterChef(), user),
+            allocKafra == address(0) ||
+                IAllocKafra(allocKafra).canAllocate(amount, byalan.balanceOf(), byalan.balanceOfMasterChef(), user),
             "capacity limit reached"
         );
     }
@@ -811,7 +809,7 @@ contract IzludeV2 is IIzludeV2, Ownable {
         if (fee > 0) {
             r -= fee;
             want.safeTransfer(address(feeKafra), fee);
-            feeKafra.distributeWithdrawFee(want, user);
+            IFeeKafra(feeKafra).distributeWithdrawFee(want, user);
         }
         want.safeTransfer(msg.sender, r);
         return r;
