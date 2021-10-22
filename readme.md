@@ -9,7 +9,6 @@
 - juno เป็น proprietary ของ ksw ที่จะไม่เปิดเผย source code ไม่มีอะไรเกี่ยวกับ prontera ในเรื่องของ owner
 - มี function storeAllowance, approveStore, increaseStoreAllowance, decreaseStoreAllowance, depositFor, storeKeepJellopy, storeReturnJellopy, storeWithdraw สำหรับให้ user approve เพื่อ stake share หรือมอบอำนาจให้ contract อื่น deposit และ withdraw share แทน
 - owner = timelock 1 day
-- juno guide = กระเป๋าธรรมดา
 
 # Prontera approve flow
 approveStore ทำงานเหมือน approve ของ ERC20 แต่จะทำให้ store ทำ action ได้ 2 อย่าง (ออกแบบมาเพื่อ staking + take profit / stop loss)
@@ -18,9 +17,6 @@ approveStore ทำงานเหมือน approve ของ ERC20 แต่
 store สามารถคืน jellopy ที่ keep ด้วยการเรียก storeReturnJellopy
 - summary
 user -> increaseStoreAllowance -> storeKeepJellopy -> storeWithdraw(optional)
-```
-ถ้า storedJellopy > 0 จะไม่สามารถ emergency withdraw ได้ ต้องให้ user เรียก storeReturnJellopy คืนกลับมาเป็น jellopy ให้หมดก่อน
-```
 
 # Emperium.sol
 - Masterchef แจก เหรียญ ksw (สำหรับ stake ksw เพื่อให้ได้ ksw)
