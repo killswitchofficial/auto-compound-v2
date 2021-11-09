@@ -565,7 +565,6 @@ contract PronteraReserve is Ownable {
 
     IERC20 public immutable ksw;
     address public prontera;
-    address public emperium;
 
     uint256 public balances;
 
@@ -580,13 +579,6 @@ contract PronteraReserve is Ownable {
         require(IReserveWithdrawer(_prontera).reserve() == address(this), "invalid prontera");
 
         prontera = _prontera;
-    }
-
-    function setEmperium(address _emperium) external onlyOwner {
-        require(emperium == address(0), "?");
-        require(IReserveWithdrawer(_emperium).reserve() == address(this), "invalid emperium");
-
-        emperium = _emperium;
     }
 
     function withdraw(address to, uint256 amount) external returns (uint256) {
