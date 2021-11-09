@@ -582,7 +582,7 @@ contract PronteraReserve is Ownable {
     }
 
     function withdraw(address to, uint256 amount) external returns (uint256) {
-        require(msg.sender == prontera || msg.sender == emperium, "!withdrawer");
+        require(msg.sender == prontera, "!withdrawer");
 
         return _safeTransfer(to, amount);
     }
