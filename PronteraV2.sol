@@ -1,5 +1,6 @@
 // File @openzeppelin/contracts/utils/Context.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -26,6 +27,7 @@ abstract contract Context {
 
 // File @openzeppelin/contracts/access/Ownable.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -98,6 +100,7 @@ abstract contract Ownable is Context {
 
 // File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -182,6 +185,7 @@ interface IERC20 {
 
 // File @openzeppelin/contracts/utils/Address.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -401,6 +405,7 @@ library Address {
 
 // File @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -500,6 +505,7 @@ library SafeERC20 {
 
 // File @openzeppelin/contracts/security/ReentrancyGuard.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -565,6 +571,7 @@ abstract contract ReentrancyGuard {
 
 // File contracts/libraries/Math.sol
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -610,6 +617,7 @@ library Math {
 
 // File contracts/bsc/interfaces/IPronteraReserve.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -622,6 +630,7 @@ interface IPronteraReserve {
 
 // File contracts/bsc/interfaces/IByalanIsland.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -632,6 +641,7 @@ interface IByalanIsland {
 
 // File contracts/bsc/interfaces/ISailor.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -648,6 +658,7 @@ interface ISailor {
 
 // File contracts/bsc/interfaces/IByalan.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 interface IByalan is IByalanIsland, ISailor {
@@ -683,51 +694,11 @@ interface IByalan is IByalanIsland, ISailor {
 }
 
 
-// File contracts/bsc/interfaces/IFeeKafra.sol
-
-
-pragma solidity 0.8.9;
-
-interface IFeeKafra {
-    function MAX_FEE() external view returns (uint256);
-
-    function withdrawFee() external view returns (uint256);
-
-    function treasuryFeeWithdraw() external view returns (uint256);
-
-    function kswFeeWithdraw() external view returns (uint256);
-
-    function calculateWithdrawFee(uint256 _wantAmount, address _user) external view returns (uint256);
-
-    function distributeWithdrawFee(IERC20 _token, address _fromUser) external;
-}
-
-
-// File contracts/bsc/interfaces/IAllocKafra.sol
-
-
-pragma solidity 0.8.9;
-
-interface IAllocKafra {
-    function MAX_ALLOCATION() external view returns (uint16);
-
-    function limitAllocation() external view returns (uint16);
-
-    function canAllocate(
-        uint256 _amount,
-        uint256 _balanceOfWant,
-        uint256 _balanceOfMasterChef,
-        address _user
-    ) external view returns (bool);
-}
-
-
 // File contracts/bsc/interfaces/IIzludeV2.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
-
-
 
 
 interface IIzludeV2 {
@@ -745,9 +716,9 @@ interface IIzludeV2 {
 
     function byalan() external view returns (IByalan);
 
-    function feeKafra() external view returns (IFeeKafra);
+    function feeKafra() external view returns (address);
 
-    function allocKafra() external view returns (IAllocKafra);
+    function allocKafra() external view returns (address);
 
     function calculateWithdrawFee(uint256 amount, address user) external view returns (uint256);
 }
@@ -755,6 +726,7 @@ interface IIzludeV2 {
 
 // File contracts/bsc/interfaces/IWETH.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -767,6 +739,7 @@ interface IWETH is IERC20 {
 
 // File contracts/bsc/PronteraV2.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -1052,8 +1025,8 @@ contract PronteraV2 is Ownable, ReentrancyGuard {
         require(tokens.length == tokenAmounts.length, "length mismatch");
         PoolInfo storage pool = poolInfo[izlude];
         IERC20 want = pool.want;
-        uint256 beforeBal = want.balanceOf(address(this));
 
+        uint256 beforeBal = want.balanceOf(address(this));
         for (uint256 i = 0; i < tokens.length; i++) {
             require(_safeERC20TransferIn(tokens[i], tokenAmounts[i]) == tokenAmounts[i], "!amount");
             if (tokens[i] != want) {
@@ -1061,9 +1034,9 @@ contract PronteraV2 is Ownable, ReentrancyGuard {
             }
         }
         juno.functionCall(data, "juno: failed");
-
         uint256 amount = want.balanceOf(address(this)) - beforeBal;
         require(amount >= amountOutMin, "insufficient output amount");
+
         _deposit(msg.sender, izlude, want, amount);
         emit DepositToken(msg.sender, izlude, tokenAmounts, amount);
     }
@@ -1075,18 +1048,19 @@ contract PronteraV2 is Ownable, ReentrancyGuard {
         bytes calldata data
     ) external payable nonReentrant ensure(deadline) {
         require(msg.value > 0, "!value");
-
         PoolInfo storage pool = poolInfo[izlude];
         IERC20 want = pool.want;
+
         uint256 beforeBal = want.balanceOf(address(this));
-
-        WETH.deposit{value: msg.value}();
-        WETH.safeTransfer(juno, msg.value);
-        juno.functionCall(data, "juno: failed");
-
+        {
+            WETH.deposit{value: msg.value}();
+            WETH.safeTransfer(juno, msg.value);
+            juno.functionCall(data, "juno: failed");
+        }
         uint256 afterBal = want.balanceOf(address(this));
         uint256 amount = afterBal - beforeBal;
         require(amount >= amountOutMin, "insufficient output amount");
+
         _deposit(msg.sender, izlude, want, amount);
         emit DepositEther(msg.sender, izlude, msg.value, amount);
     }
@@ -1161,18 +1135,17 @@ contract PronteraV2 is Ownable, ReentrancyGuard {
         require(token != want, "!want");
         uint256 amount = _withdraw(msg.sender, izlude, want, jellopyAmount);
 
-        uint256 beforeBal = token.balanceOf(msg.sender);
-
-        want.safeTransfer(juno, amount);
-
-        juno.functionCall(data, "juno: failed");
-
-        token.safeTransfer(msg.sender, token.balanceOf(address(this)));
-
-        uint256 afterBal = token.balanceOf(msg.sender);
+        uint256 beforeBal = token.balanceOf(address(this));
+        {
+            want.safeTransfer(juno, amount);
+            juno.functionCall(data, "juno: failed");
+        }
+        uint256 afterBal = token.balanceOf(address(this));
         uint256 amountOut = afterBal - beforeBal;
         require(amountOut >= amountOutMin, "insufficient output amount");
-        emit WithdrawToken(msg.sender, izlude, amountOut, jellopyAmount);
+
+        token.safeTransfer(msg.sender, amountOut);
+        emit WithdrawToken(msg.sender, izlude, jellopyAmount, amountOut);
     }
 
     function withdrawEther(
@@ -1186,13 +1159,14 @@ contract PronteraV2 is Ownable, ReentrancyGuard {
         uint256 amount = _withdraw(msg.sender, izlude, pool.want, jellopyAmount);
 
         uint256 beforeBal = WETH.balanceOf(address(this));
-
-        pool.want.safeTransfer(juno, amount);
-        juno.functionCall(data, "juno: failed");
-
+        {
+            pool.want.safeTransfer(juno, amount);
+            juno.functionCall(data, "juno: failed");
+        }
         uint256 afterBal = WETH.balanceOf(address(this));
         uint256 amountOut = afterBal - beforeBal;
         require(amountOut >= amountOutMin, "insufficient output amount");
+
         WETH.withdraw(amountOut);
         payable(msg.sender).sendValue(amountOut);
         emit WithdrawEther(msg.sender, izlude, jellopyAmount, amountOut);

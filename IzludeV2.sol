@@ -1,5 +1,6 @@
 // File @openzeppelin/contracts/utils/Context.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -26,6 +27,7 @@ abstract contract Context {
 
 // File @openzeppelin/contracts/access/Ownable.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -98,6 +100,7 @@ abstract contract Ownable is Context {
 
 // File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -182,6 +185,7 @@ interface IERC20 {
 
 // File @openzeppelin/contracts/utils/Address.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -401,6 +405,7 @@ library Address {
 
 // File @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -500,6 +505,7 @@ library SafeERC20 {
 
 // File contracts/bsc/interfaces/IByalanIsland.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -510,6 +516,7 @@ interface IByalanIsland {
 
 // File contracts/bsc/interfaces/ISailor.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -526,6 +533,7 @@ interface ISailor {
 
 // File contracts/bsc/interfaces/IByalan.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 interface IByalan is IByalanIsland, ISailor {
@@ -563,6 +571,7 @@ interface IByalan is IByalanIsland, ISailor {
 
 // File contracts/bsc/interfaces/IFeeKafra.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -583,6 +592,7 @@ interface IFeeKafra {
 
 // File contracts/bsc/interfaces/IIzludeV2.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -612,6 +622,7 @@ interface IIzludeV2 {
 
 // File contracts/bsc/interfaces/IAllocKafra.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -631,6 +642,7 @@ interface IAllocKafra {
 
 // File contracts/libraries/Math.sol
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -676,6 +688,7 @@ library Math {
 
 // File contracts/bsc/IzludeV2.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 

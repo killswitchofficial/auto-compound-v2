@@ -1,5 +1,6 @@
 // File @openzeppelin/contracts/utils/Context.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -26,6 +27,7 @@ abstract contract Context {
 
 // File @openzeppelin/contracts/access/Ownable.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -98,11 +100,12 @@ abstract contract Ownable is Context {
 
 // File contracts/bsc/byalan/GasPrice.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
 contract GasPrice is Ownable {
-    uint256 public maxGasPrice = 10 gwei;
+    uint256 public maxGasPrice = 5 gwei;
 
     event NewMaxGasPrice(uint256 oldPrice, uint256 newPrice);
 

@@ -1,5 +1,6 @@
 // File @openzeppelin/contracts/utils/Context.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -26,6 +27,7 @@ abstract contract Context {
 
 // File @openzeppelin/contracts/access/Ownable.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -98,6 +100,7 @@ abstract contract Ownable is Context {
 
 // File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -182,6 +185,7 @@ interface IERC20 {
 
 // File @openzeppelin/contracts/utils/Address.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -401,6 +405,7 @@ library Address {
 
 // File @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -500,6 +505,7 @@ library SafeERC20 {
 
 // File contracts/bsc/interfaces/IFeeKafra.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -518,39 +524,134 @@ interface IFeeKafra {
 }
 
 
-// File contracts/bsc/FeeKafra.sol
+// File contracts/bsc/interfaces/IFeeKafraV2.sol
 
+//SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.9;
+
+interface IFeeKafraV2 is IFeeKafra {
+    function MAX_FEE() external view returns (uint256);
+
+    function withdrawFee() external view returns (uint256);
+
+    function userWithdrawFee(address _user) external view returns (uint256);
+
+    function holdingKSW() external view returns (uint256);
+
+    function holdingKSWWithdrawFee() external view returns (uint256);
+
+    function treasuryFeeWithdraw() external view returns (uint256);
+
+    function kswFeeWithdraw() external view returns (uint256);
+
+    function calculateWithdrawFee(uint256 _wantAmount, address _user) external view returns (uint256);
+
+    function distributeWithdrawFee(IERC20 _token, address _fromUser) external;
+
+    function ignoreFee(bool enable) external;
+}
+
+
+// File contracts/bsc/FeeKafraV2.sol
+
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
 
-contract FeeKafra is Ownable, IFeeKafra {
+contract FeeKafraV2 is Ownable, IFeeKafraV2 {
     using SafeERC20 for IERC20;
 
     uint256 public constant override MAX_FEE = 10000;
 
     uint256 public constant MAX_WITHDRAW_FEE = 1000; // 10%
-    uint256 public override withdrawFee = 200; // 2 %
+    uint256 public override withdrawFee = 20; // 0.2 %
     uint256 public override treasuryFeeWithdraw = 5000; // 50% of total fee
     uint256 public override kswFeeWithdraw = 5000; // 50% of total fee
-    uint256 public withdrawFeeSum = 10000;
+    uint256 public holdingKSW = 1500 ether;
+    uint256 public holdingKSWWithdrawFee = 10; // 0.1 %
+    uint256 public holdingKSWGod = 10000 ether;
+    uint256 public holdingKSWGodWithdrawFee = 5; // 0.05 %
+
+    address public immutable ksw;
 
     address public kswFeeRecipient;
     address public treasuryFeeRecipient;
+
+    mapping(address => bool) public allowIgnoreFeeCaller;
+    uint256 private ignoreFeeBlock;
 
     event SetWithdrawFee(uint256 fee);
     event SetTreasuryFeeWithdraw(uint256 fee);
     event SetKSWFeeWithdraw(uint256 fee);
     event SetKSWFeeRecipient(address to);
     event SetTreasuryFeeRecipient(address to);
+    event SetHoldingKSW(uint256 amount);
+    event SetHoldingKSWWithdrawFee(uint256 fee);
+    event SetHoldingKSWGod(uint256 amount);
+    event SetHoldingKSWGodWithdrawFee(uint256 fee);
+    event SetAllowIgnoreFeeCaller(address addr, bool allow);
 
-    constructor(address _kswFeeRecipient, address _treasuryFeeRecipient) {
+    constructor(
+        address _ksw,
+        address _kswFeeRecipient,
+        address _treasuryFeeRecipient
+    ) {
+        ksw = _ksw;
         kswFeeRecipient = _kswFeeRecipient;
         treasuryFeeRecipient = _treasuryFeeRecipient;
     }
 
-    function calculateWithdrawFee(uint256 _wantAmount, address) external view override returns (uint256) {
-        return (_wantAmount * withdrawFee) / MAX_FEE;
+    function userBalance(address _user) public view returns (uint256) {
+        uint256 bal = IERC20(ksw).balanceOf(_user);
+        return bal;
+    }
+
+    function isHoldingKSW(address _user) public view returns (bool) {
+        if (holdingKSW == 0) {
+            return false;
+        }
+
+        uint256 bal = userBalance(_user);
+        return bal >= holdingKSW;
+    }
+
+    function isGod(address _user) public view returns (bool) {
+        if (holdingKSWGod == 0) {
+            return false;
+        }
+
+        uint256 bal = userBalance(_user);
+        return bal >= holdingKSWGod;
+    }
+
+    function setHoldingKSW(uint256 _amount) external onlyOwner {
+        holdingKSW = _amount;
+        emit SetHoldingKSW(_amount);
+    }
+
+    function setHoldingKSWGod(uint256 _amount) external onlyOwner {
+        holdingKSWGod = _amount;
+        emit SetHoldingKSWGod(_amount);
+    }
+
+    function userWithdrawFee(address _user) public view override returns (uint256) {
+        if (isGod(_user)) {
+            return holdingKSWGodWithdrawFee;
+        }
+        if (isHoldingKSW(_user)) {
+            return holdingKSWWithdrawFee;
+        }
+        return withdrawFee;
+    }
+
+    function calculateWithdrawFee(uint256 _wantAmount, address _user) external view override returns (uint256) {
+        if (ignoreFeeBlock == block.number) {
+            return 0;
+        }
+
+        return (_wantAmount * userWithdrawFee(_user)) / MAX_FEE;
     }
 
     function setWithdrawFee(uint256 _fee) external onlyOwner {
@@ -560,15 +661,27 @@ contract FeeKafra is Ownable, IFeeKafra {
         emit SetWithdrawFee(_fee);
     }
 
+    function setHoldingKSWWithdrawFee(uint256 _fee) external onlyOwner {
+        require(_fee <= MAX_WITHDRAW_FEE, "!cap");
+
+        holdingKSWWithdrawFee = _fee;
+        emit SetHoldingKSWWithdrawFee(_fee);
+    }
+
+    function setHoldingKSWGodWithdrawFee(uint256 _fee) external onlyOwner {
+        require(_fee <= MAX_WITHDRAW_FEE, "!cap");
+
+        holdingKSWGodWithdrawFee = _fee;
+        emit SetHoldingKSWGodWithdrawFee(_fee);
+    }
+
     function setTreasuryFeeWithdraw(uint256 _fee) external onlyOwner {
         treasuryFeeWithdraw = _fee;
-        withdrawFeeSum = treasuryFeeWithdraw + kswFeeWithdraw;
         emit SetTreasuryFeeWithdraw(_fee);
     }
 
     function setKSWFeeWithdraw(uint256 _fee) external onlyOwner {
         kswFeeWithdraw = _fee;
-        withdrawFeeSum = treasuryFeeWithdraw + kswFeeWithdraw;
         emit SetKSWFeeWithdraw(_fee);
     }
 
@@ -582,15 +695,45 @@ contract FeeKafra is Ownable, IFeeKafra {
         emit SetTreasuryFeeRecipient(_to);
     }
 
-    function distributeWithdrawFee(IERC20 _token, address) external override {
+    function setAllowIgnoreFeeCaller(address _to, bool _allow) external onlyOwner {
+        allowIgnoreFeeCaller[_to] = _allow;
+        emit SetAllowIgnoreFeeCaller(_to, _allow);
+    }
+
+    // caller to ignoreFee *MUST* call ignoreFee(false) to reset state
+    function ignoreFee(bool enable) external {
+        require(allowIgnoreFeeCaller[msg.sender], "!allow");
+
+        if (enable) {
+            // in-case caller forgot to reset state, we reduce impact to 1 block
+            ignoreFeeBlock = block.number;
+            return;
+        }
+        ignoreFeeBlock = 0;
+    }
+
+    function distributeWithdrawFee(IERC20 _token, address _user) external override {
         uint256 feeAmount = _token.balanceOf(address(this));
 
-        uint256 treasuryFeeAmount = (feeAmount * treasuryFeeWithdraw) / withdrawFeeSum;
+        uint256 treasuryFeeAmount;
+        uint256 kswFeeAmount;
+        if (isGod(_user)) {
+            uint256 withdrawFeeSum = treasuryFeeWithdraw + holdingKSWGodWithdrawFee;
+            treasuryFeeAmount = (feeAmount * treasuryFeeWithdraw) / withdrawFeeSum;
+            kswFeeAmount = (feeAmount * holdingKSWGodWithdrawFee) / withdrawFeeSum;
+        } else if (isHoldingKSW(_user)) {
+            uint256 withdrawFeeSum = treasuryFeeWithdraw + holdingKSWWithdrawFee;
+            treasuryFeeAmount = (feeAmount * treasuryFeeWithdraw) / withdrawFeeSum;
+            kswFeeAmount = (feeAmount * holdingKSWWithdrawFee) / withdrawFeeSum;
+        } else {
+            uint256 withdrawFeeSum = treasuryFeeWithdraw + kswFeeWithdraw;
+            treasuryFeeAmount = (feeAmount * treasuryFeeWithdraw) / withdrawFeeSum;
+            kswFeeAmount = (feeAmount * kswFeeWithdraw) / withdrawFeeSum;
+        }
+
         if (treasuryFeeAmount > 0) {
             _token.safeTransfer(treasuryFeeRecipient, treasuryFeeAmount);
         }
-
-        uint256 kswFeeAmount = (feeAmount * kswFeeWithdraw) / withdrawFeeSum;
         if (kswFeeAmount > 0) {
             _token.safeTransfer(kswFeeRecipient, kswFeeAmount);
         }

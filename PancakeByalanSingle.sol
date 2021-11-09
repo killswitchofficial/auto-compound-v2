@@ -610,108 +610,6 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
 }
 
 
-// File contracts/bsc/interfaces/IUniswapV2Pair.sol
-
-// SPDX-License-Identifier: MIT
-
-pragma solidity 0.8.9;
-
-interface IUniswapV2Pair {
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    function name() external pure returns (string memory);
-
-    function symbol() external pure returns (string memory);
-
-    function decimals() external pure returns (uint8);
-
-    function totalSupply() external view returns (uint256);
-
-    function balanceOf(address owner) external view returns (uint256);
-
-    function allowance(address owner, address spender) external view returns (uint256);
-
-    function approve(address spender, uint256 value) external returns (bool);
-
-    function transfer(address to, uint256 value) external returns (bool);
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) external returns (bool);
-
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
-
-    function PERMIT_TYPEHASH() external pure returns (bytes32);
-
-    function nonces(address owner) external view returns (uint256);
-
-    function permit(
-        address owner,
-        address spender,
-        uint256 value,
-        uint256 deadline,
-        uint8 v,
-        bytes32 r,
-        bytes32 s
-    ) external;
-
-    event Mint(address indexed sender, uint256 amount0, uint256 amount1);
-    event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
-    event Swap(
-        address indexed sender,
-        uint256 amount0In,
-        uint256 amount1In,
-        uint256 amount0Out,
-        uint256 amount1Out,
-        address indexed to
-    );
-    event Sync(uint112 reserve0, uint112 reserve1);
-
-    function MINIMUM_LIQUIDITY() external pure returns (uint256);
-
-    function factory() external view returns (address);
-
-    function token0() external view returns (address);
-
-    function token1() external view returns (address);
-
-    function getReserves()
-        external
-        view
-        returns (
-            uint112 reserve0,
-            uint112 reserve1,
-            uint32 blockTimestampLast
-        );
-
-    function price0CumulativeLast() external view returns (uint256);
-
-    function price1CumulativeLast() external view returns (uint256);
-
-    function kLast() external view returns (uint256);
-
-    function mint(address to) external returns (uint256 liquidity);
-
-    function burn(address to) external returns (uint256 amount0, uint256 amount1);
-
-    function swap(
-        uint256 amount0Out,
-        uint256 amount1Out,
-        address to,
-        bytes calldata data
-    ) external;
-
-    function skim(address to) external;
-
-    function sync() external;
-
-    function initialize(address, address) external;
-}
-
-
 // File contracts/bsc/interfaces/pancake/IMasterChef.sol
 
 //SPDX-License-Identifier: MIT
@@ -1176,7 +1074,7 @@ abstract contract Sailor is ByalanIsland, ISailor {
 }
 
 
-// File contracts/bsc/byalan/pancake/PancakeByalanLP.sol
+// File contracts/bsc/byalan/pancake/PancakeByalanSingle.sol
 
 //SPDX-License-Identifier: MIT
 
@@ -1186,8 +1084,7 @@ pragma solidity 0.8.9;
 
 
 
-
-contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
+contract PancakeByalanSingle is ByalanIsland, Sailor, IByalan {
     using SafeERC20 for IERC20;
     using Address for address payable;
 
@@ -1195,8 +1092,6 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
     address public constant WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
     address public constant CAKE = 0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82;
     address public immutable override want;
-    address public immutable lpToken0;
-    address public immutable lpToken1;
 
     // Third party contracts
     address public constant MASTERCHEF = 0x73feaa1eE314F8c655E354234017bE2193C9E24E;
@@ -1204,8 +1099,6 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
 
     // Routes
     address[] public cakeToWbnbRoute;
-    address[] public cakeToLp0Route;
-    address[] public cakeToLp1Route;
 
     event Harvest(address indexed harvester);
 
@@ -1215,9 +1108,7 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
         address _kswFeeRecipient,
         address _treasuryFeeRecipient,
         address _harvester,
-        uint256 _pid,
-        address[] memory _cakeToLp0Route,
-        address[] memory _cakeToLp1Route
+        uint256 _pid
     )
         ByalanIsland(
             _hydra,
@@ -1231,29 +1122,8 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
         pid = _pid;
 
         want = IMasterChef(MASTERCHEF).poolInfo(_pid).lpToken;
-        lpToken0 = IUniswapV2Pair(want).token0();
-        lpToken1 = IUniswapV2Pair(want).token1();
 
         cakeToWbnbRoute = [CAKE, WBNB];
-        if (lpToken0 != CAKE) {
-            require(_cakeToLp0Route[0] == CAKE, "invalid lp 0 route");
-            require(_cakeToLp0Route[_cakeToLp0Route.length - 1] == lpToken0, "invalid lp 0 route");
-            require(
-                IUniswapV2Router02(unirouter).getAmountsOut(1 ether, _cakeToLp0Route)[_cakeToLp0Route.length - 1] > 0,
-                "invalid lp 0 route"
-            );
-            cakeToLp0Route = _cakeToLp0Route;
-        }
-
-        if (lpToken1 != CAKE) {
-            require(_cakeToLp1Route[0] == CAKE, "invalid lp 1 route");
-            require(_cakeToLp1Route[_cakeToLp1Route.length - 1] == lpToken1, "invalid lp 1 route");
-            require(
-                IUniswapV2Router02(unirouter).getAmountsOut(1 ether, _cakeToLp1Route)[_cakeToLp1Route.length - 1] > 0,
-                "invalid lp 1 route"
-            );
-            cakeToLp1Route = _cakeToLp1Route;
-        }
 
         _giveAllowances();
     }
@@ -1261,14 +1131,16 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
     /**
      * @dev Function to synchronize balances before new user deposit.
      */
-    function beforeDeposit() external override {}
+    function beforeDeposit() external override onlyIzlude {
+        _harvest();
+    }
 
     // puts the funds to work
     function deposit() public override whenNotPaused {
         uint256 wantBal = IERC20(want).balanceOf(address(this));
 
         if (wantBal > 0) {
-            IMasterChef(MASTERCHEF).deposit(pid, wantBal);
+            IMasterChef(MASTERCHEF).enterStaking(wantBal);
         }
     }
 
@@ -1276,7 +1148,7 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
         uint256 wantBal = IERC20(want).balanceOf(address(this));
 
         if (wantBal < _amount) {
-            IMasterChef(MASTERCHEF).withdraw(pid, _amount - wantBal);
+            IMasterChef(MASTERCHEF).leaveStaking(_amount - wantBal);
             wantBal = IERC20(want).balanceOf(address(this));
         }
 
@@ -1289,12 +1161,19 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
 
     // compounds earnings and charges performance fee
     function harvest() external override whenNotPaused onlyEOA onlyHarvester gasThrottle {
-        IMasterChef(MASTERCHEF).deposit(pid, 0);
-        chargeFees();
-        addLiquidity();
-        deposit();
+        _harvest();
+    }
 
-        emit Harvest(msg.sender);
+    function _harvest() private {
+        IMasterChef(MASTERCHEF).leaveStaking(0);
+
+        uint256 wantBal = IERC20(want).balanceOf(address(this));
+        if (wantBal > 0) {
+            chargeFees();
+            deposit();
+
+            emit Harvest(msg.sender);
+        }
     }
 
     // performance fees
@@ -1305,49 +1184,13 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
         uint256 bnbBal = address(this).balance;
 
         uint256 callFeeAmount = (bnbBal * callFee) / feeSum;
-        payable(msg.sender).sendValue(callFeeAmount);
+        payable(tx.origin).sendValue(callFeeAmount);
 
         uint256 treasuryFeeAmount = (bnbBal * treasuryFee) / feeSum;
         payable(treasuryFeeRecipient).sendValue(treasuryFeeAmount);
 
         uint256 kswFeeAmount = (bnbBal * kswFee) / feeSum;
         payable(kswFeeRecipient).sendValue(kswFeeAmount);
-    }
-
-    // Adds liquidity to AMM and gets more LP tokens.
-    function addLiquidity() internal {
-        uint256 cakeHalf = IERC20(CAKE).balanceOf(address(this)) / 2;
-
-        if (lpToken0 != CAKE) {
-            IUniswapV2Router02(unirouter).swapExactTokensForTokens(
-                cakeHalf,
-                0,
-                cakeToLp0Route,
-                address(this),
-                block.timestamp
-            );
-        }
-
-        if (lpToken1 != CAKE) {
-            IUniswapV2Router02(unirouter).swapExactTokensForTokens(
-                cakeHalf,
-                0,
-                cakeToLp1Route,
-                address(this),
-                block.timestamp
-            );
-        }
-
-        IUniswapV2Router02(unirouter).addLiquidity(
-            lpToken0,
-            lpToken1,
-            IERC20(lpToken0).balanceOf(address(this)),
-            IERC20(lpToken1).balanceOf(address(this)),
-            0,
-            0,
-            address(this),
-            block.timestamp
-        );
     }
 
     // calculate the total underlaying 'want' held by the strat.
@@ -1418,20 +1261,11 @@ contract PancakeByalanLP is ByalanIsland, Sailor, IByalan {
     function _giveAllowances() internal {
         IERC20(want).safeApprove(MASTERCHEF, type(uint256).max);
         IERC20(CAKE).safeApprove(unirouter, type(uint256).max);
-
-        // lp token 0 and 1 maybe cake so approve 0 is needed here
-        IERC20(lpToken0).safeApprove(unirouter, 0);
-        IERC20(lpToken0).safeApprove(unirouter, type(uint256).max);
-
-        IERC20(lpToken1).safeApprove(unirouter, 0);
-        IERC20(lpToken1).safeApprove(unirouter, type(uint256).max);
     }
 
     function _removeAllowances() internal {
         IERC20(want).safeApprove(MASTERCHEF, 0);
         IERC20(CAKE).safeApprove(unirouter, 0);
-        IERC20(lpToken0).safeApprove(unirouter, 0);
-        IERC20(lpToken1).safeApprove(unirouter, 0);
     }
 
     receive() external payable {

@@ -1,5 +1,6 @@
 // File @openzeppelin/contracts/utils/Context.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -26,6 +27,7 @@ abstract contract Context {
 
 // File @openzeppelin/contracts/access/Ownable.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -98,6 +100,7 @@ abstract contract Ownable is Context {
 
 // File @openzeppelin/contracts/token/ERC20/IERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -182,6 +185,7 @@ interface IERC20 {
 
 // File @openzeppelin/contracts/utils/Address.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -401,6 +405,7 @@ library Address {
 
 // File @openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -500,6 +505,7 @@ library SafeERC20 {
 
 // File @openzeppelin/contracts/security/ReentrancyGuard.sol@v4.3.2
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
 
@@ -565,6 +571,7 @@ abstract contract ReentrancyGuard {
 
 // File contracts/libraries/Math.sol
 
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -610,6 +617,7 @@ library Math {
 
 // File contracts/bsc/interfaces/IPronteraReserve.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
@@ -622,6 +630,7 @@ interface IPronteraReserve {
 
 // File contracts/bsc/Emperium.sol
 
+//SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.9;
 
