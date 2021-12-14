@@ -986,7 +986,7 @@ contract PronteraV2 is Ownable, ReentrancyGuard {
         user.rewardDebt = (tJellopy * pool.accKSWPerJellopy) / 1e12;
     }
 
-    function harvest(address[] calldata izludes) external {
+    function harvest(address[] calldata izludes) external nonReentrant {
         for (uint256 i = 0; i < izludes.length; i++) {
             _deposit(msg.sender, izludes[i], IERC20(address(0)), 0);
         }
